@@ -1,0 +1,548 @@
+1
+00:00:04,020 --> 00:00:06,702
+The hard assumption here is that you've watched part 3,
+
+2
+00:00:06,702 --> 00:00:09,920
+giving an intuitive walkthrough of the backpropagation algorithm.
+
+3
+00:00:11,040 --> 00:00:14,220
+Here we get a little more formal and dive into the relevant calculus.
+
+4
+00:00:14,820 --> 00:00:17,265
+It's normal for this to be at least a little confusing,
+
+5
+00:00:17,265 --> 00:00:20,600
+so the mantra to regularly pause and ponder certainly applies as much here
+
+6
+00:00:20,600 --> 00:00:21,400
+as anywhere else.
+
+7
+00:00:21,940 --> 00:00:25,875
+Our main goal is to show how people in machine learning commonly think about
+
+8
+00:00:25,875 --> 00:00:28,825
+the chain rule from calculus in the context of networks,
+
+9
+00:00:28,825 --> 00:00:32,501
+which has a different feel from how most introductory calculus courses
+
+10
+00:00:32,501 --> 00:00:33,640
+approach the subject.
+
+11
+00:00:34,340 --> 00:00:36,971
+For those of you uncomfortable with the relevant calculus,
+
+12
+00:00:36,971 --> 00:00:38,740
+I do have a whole series on the topic.
+
+13
+00:00:39,960 --> 00:00:43,021
+Let's start off with an extremely simple network,
+
+14
+00:00:43,021 --> 00:00:46,020
+one where each layer has a single neuron in it.
+
+15
+00:00:46,320 --> 00:00:49,896
+This network is determined by three weights and three biases,
+
+16
+00:00:49,896 --> 00:00:54,880
+and our goal is to understand how sensitive the cost function is to these variables.
+
+17
+00:00:55,420 --> 00:00:58,096
+That way, we know which adjustments to those terms will
+
+18
+00:00:58,096 --> 00:01:00,820
+cause the most efficient decrease to the cost function.
+
+19
+00:01:01,960 --> 00:01:04,840
+And we're just going to focus on the connection between the last two neurons.
+
+20
+00:01:05,980 --> 00:01:10,266
+Let's label the activation of that last neuron with a superscript L,
+
+21
+00:01:10,266 --> 00:01:15,560
+indicating which layer it's in, so the activation of the previous neuron is a(L-1).
+
+22
+00:01:16,360 --> 00:01:20,092
+These are not exponents, they're just a way of indexing what we're talking about,
+
+23
+00:01:20,092 --> 00:01:23,040
+since I want to save subscripts for different indices later on.
+
+24
+00:01:23,720 --> 00:01:27,950
+Let's say that the value we want this last activation to be for
+
+25
+00:01:27,950 --> 00:01:32,180
+a given training example is y, for example, y might be 0 or 1.
+
+26
+00:01:32,840 --> 00:01:39,240
+So the cost of this network for a single training example is (a(L) - y) squared.
+
+27
+00:01:40,260 --> 00:01:44,380
+We'll denote the cost of that one training example as C0.
+
+28
+00:01:45,900 --> 00:01:49,840
+As a reminder, this last activation is determined by a weight,
+
+29
+00:01:49,840 --> 00:01:55,242
+which I'm going to call w(L), times the previous neuron's activation plus some bias,
+
+30
+00:01:55,242 --> 00:01:56,640
+which I'll call b(L).
+
+31
+00:01:57,420 --> 00:02:01,320
+And then you pump that through some special nonlinear function like the sigmoid or ReLU.
+
+32
+00:02:01,800 --> 00:02:05,442
+It's actually going to make things easier for us if we give a special name to
+
+33
+00:02:05,442 --> 00:02:09,320
+this weighted sum, like z, with the same superscript as the relevant activations.
+
+34
+00:02:10,380 --> 00:02:15,331
+This is a lot of terms, and a way you might conceptualize it is that the weight,
+
+35
+00:02:15,331 --> 00:02:19,353
+previous action and the bias all together are used to compute z,
+
+36
+00:02:19,353 --> 00:02:23,871
+which in turn lets us compute a, which finally, along with a constant y,
+
+37
+00:02:23,871 --> 00:02:25,480
+lets us compute the cost.
+
+38
+00:02:27,340 --> 00:02:31,946
+And of course a(L-1) is influenced by its own weight and bias and such,
+
+39
+00:02:31,946 --> 00:02:35,060
+but we're not going to focus on that right now.
+
+40
+00:02:35,700 --> 00:02:37,620
+All of these are just numbers, right?
+
+41
+00:02:38,060 --> 00:02:41,040
+And it can be nice to think of each one as having its own little number line.
+
+42
+00:02:41,720 --> 00:02:45,183
+Our first goal is to understand how sensitive the
+
+43
+00:02:45,183 --> 00:02:49,000
+cost function is to small changes in our weight w(L).
+
+44
+00:02:49,540 --> 00:02:54,860
+Or phrase differently, what is the derivative of C with respect to w(L)?
+
+45
+00:02:55,600 --> 00:03:00,666
+When you see this del w term, think of it as meaning some tiny nudge to W,
+
+46
+00:03:00,666 --> 00:03:04,979
+like a change by 0.01, and think of this del C term as meaning
+
+47
+00:03:04,979 --> 00:03:08,060
+whatever the resulting nudge to the cost is.
+
+48
+00:03:08,060 --> 00:03:10,220
+What we want is their ratio.
+
+49
+00:03:11,260 --> 00:03:15,790
+Conceptually, this tiny nudge to w(L) causes some nudge to z(L),
+
+50
+00:03:15,790 --> 00:03:21,240
+which in turn causes some nudge to a(L), which directly influences the cost.
+
+51
+00:03:23,120 --> 00:03:28,127
+So we break things up by first looking at the ratio of a tiny change to z(L)
+
+52
+00:03:28,127 --> 00:03:33,200
+to this tiny change q, that is, the derivative of z(L) with respect to w(L).
+
+53
+00:03:33,200 --> 00:03:36,959
+Likewise, you then consider the ratio of the change to a(L) to
+
+54
+00:03:36,959 --> 00:03:40,658
+the tiny change in z(L) that caused it, as well as the ratio
+
+55
+00:03:40,658 --> 00:03:44,660
+between the final nudge to C and this intermediate nudge to a(L).
+
+56
+00:03:45,740 --> 00:03:50,371
+This right here is the chain rule, where multiplying together these
+
+57
+00:03:50,371 --> 00:03:55,140
+three ratios gives us the sensitivity of C to small changes in w(L).
+
+58
+00:03:56,880 --> 00:03:59,562
+So on screen right now, there's a lot of symbols,
+
+59
+00:03:59,562 --> 00:04:02,901
+and take a moment to make sure it's clear what they all are,
+
+60
+00:04:02,901 --> 00:04:06,240
+because now we're going to compute the relevant derivatives.
+
+61
+00:04:07,440 --> 00:04:13,160
+The derivative of C with respect to a(L) works out to be 2(a(L)-y).
+
+62
+00:04:13,980 --> 00:04:18,592
+Notice this means its size is proportional to the difference between the network's
+
+63
+00:04:18,592 --> 00:04:22,922
+output and the thing we want it to be, so if that output was very different,
+
+64
+00:04:22,922 --> 00:04:27,140
+even slight changes stand to have a big impact on the final cost function.
+
+65
+00:04:27,840 --> 00:04:31,917
+The derivative of a(L) with respect to z(L) is just the derivative
+
+66
+00:04:31,917 --> 00:04:36,180
+of our sigmoid function, or whatever nonlinearity you choose to use.
+
+67
+00:04:37,220 --> 00:04:44,660
+And the derivative of z(L) with respect to w(L) comes out to be a(L-1).
+
+68
+00:04:45,760 --> 00:04:49,384
+Now I don't know about you, but I think it's easy to get stuck head down in the
+
+69
+00:04:49,384 --> 00:04:53,420
+formulas without taking a moment to sit back and remind yourself of what they all mean.
+
+70
+00:04:53,920 --> 00:04:58,254
+In the case of this last derivative, the amount that the small nudge to the
+
+71
+00:04:58,254 --> 00:05:02,820
+weight influenced the last layer depends on how strong the previous neuron is.
+
+72
+00:05:03,380 --> 00:05:08,280
+Remember, this is where the neurons-that-fire-together-wire-together idea comes in.
+
+73
+00:05:09,200 --> 00:05:12,372
+And all of this is the derivative with respect to w(L)
+
+74
+00:05:12,372 --> 00:05:15,720
+only of the cost for a specific single training example.
+
+75
+00:05:16,440 --> 00:05:19,902
+Since the full cost function involves averaging together all
+
+76
+00:05:19,902 --> 00:05:22,960
+those costs across many different training examples,
+
+77
+00:05:22,960 --> 00:05:27,460
+its derivative requires averaging this expression over all training examples.
+
+78
+00:05:28,380 --> 00:05:31,833
+And of course, that is just one component of the gradient vector,
+
+79
+00:05:31,833 --> 00:05:35,073
+which itself is built up from the partial derivatives of the
+
+80
+00:05:35,073 --> 00:05:38,260
+cost function with respect to all those weights and biases.
+
+81
+00:05:40,640 --> 00:05:43,838
+But even though that's just one of the many partial derivatives we need,
+
+82
+00:05:43,838 --> 00:05:45,260
+it's more than 50% of the work.
+
+83
+00:05:46,340 --> 00:05:49,720
+The sensitivity to the bias, for example, is almost identical.
+
+84
+00:05:50,040 --> 00:05:55,020
+We just need to change out this del z del w term for a del z del b.
+
+85
+00:05:58,420 --> 00:06:02,400
+And if you look at the relevant formula, that derivative comes out to be 1.
+
+86
+00:06:06,140 --> 00:06:10,263
+Also, and this is where the idea of propagating backwards comes in,
+
+87
+00:06:10,263 --> 00:06:15,740
+you can see how sensitive this cost function is to the activation of the previous layer.
+
+88
+00:06:15,740 --> 00:06:19,972
+Namely, this initial derivative in the chain rule expression,
+
+89
+00:06:19,972 --> 00:06:25,660
+the sensitivity of z to the previous activation, comes out to be the weight w(L).
+
+90
+00:06:26,640 --> 00:06:30,482
+And again, even though we're not going to be able to directly influence
+
+91
+00:06:30,482 --> 00:06:33,891
+that previous layer activation, it's helpful to keep track of,
+
+92
+00:06:33,891 --> 00:06:37,949
+because now we can just keep iterating this same chain rule idea backwards
+
+93
+00:06:37,949 --> 00:06:42,440
+to see how sensitive the cost function is to previous weights and previous biases.
+
+94
+00:06:43,180 --> 00:06:47,289
+And you might think this is an overly simple example, since all layers have one neuron,
+
+95
+00:06:47,289 --> 00:06:51,020
+and things are going to get exponentially more complicated for a real network.
+
+96
+00:06:51,700 --> 00:06:55,909
+But honestly, not that much changes when we give the layers multiple neurons,
+
+97
+00:06:55,909 --> 00:06:58,860
+really it's just a few more indices to keep track of.
+
+98
+00:06:59,380 --> 00:07:02,753
+Rather than the activation of a given layer simply being a(L),
+
+99
+00:07:02,753 --> 00:07:07,160
+it's also going to have a subscript indicating which neuron of that layer it is.
+
+100
+00:07:07,160 --> 00:07:14,420
+Let's use the letter k to index the layer L-1, and j to index the layer L.
+
+101
+00:07:15,260 --> 00:07:18,567
+For the cost, again we look at what the desired output is,
+
+102
+00:07:18,567 --> 00:07:23,128
+but this time we add up the squares of the differences between these last layer
+
+103
+00:07:23,128 --> 00:07:25,180
+activations and the desired output.
+
+104
+00:07:26,080 --> 00:07:30,840
+That is, you take a sum over a(L)j minus yj squared.
+
+105
+00:07:33,040 --> 00:07:36,839
+Since there's a lot more weights, each one has to have a couple
+
+106
+00:07:36,839 --> 00:07:40,940
+more indices to keep track of where it is, so let's call the weight
+
+107
+00:07:40,940 --> 00:07:44,920
+of the edge connecting this kth neuron to the jth neuron, w(L)jk.
+
+108
+00:07:45,620 --> 00:07:48,380
+Those indices might feel a little backwards at first,
+
+109
+00:07:48,380 --> 00:07:52,183
+but it lines up with how you'd index the weight matrix I talked about in
+
+110
+00:07:52,183 --> 00:07:53,120
+the part 1 video.
+
+111
+00:07:53,620 --> 00:07:57,881
+Just as before, it's still nice to give a name to the relevant weighted sum,
+
+112
+00:07:57,881 --> 00:08:02,366
+like z, so that the activation of the last layer is just your special function,
+
+113
+00:08:02,366 --> 00:08:04,160
+like the sigmoid, applied to z.
+
+114
+00:08:04,660 --> 00:08:08,992
+You can see what I mean, where all of these are essentially the same equations we had
+
+115
+00:08:08,992 --> 00:08:13,018
+before in the one-neuron-per-layer case, it's just that it looks a little more
+
+116
+00:08:13,018 --> 00:08:13,680
+complicated.
+
+117
+00:08:15,440 --> 00:08:19,223
+And indeed, the chain-ruled derivative expression describing how
+
+118
+00:08:19,223 --> 00:08:23,420
+sensitive the cost is to a specific weight looks essentially the same.
+
+119
+00:08:23,920 --> 00:08:26,840
+I'll leave it to you to pause and think about each of those terms if you want.
+
+120
+00:08:28,980 --> 00:08:32,918
+What does change here, though, is the derivative of the cost
+
+121
+00:08:32,918 --> 00:08:36,660
+with respect to one of the activations in the layer L-1.
+
+122
+00:08:37,780 --> 00:08:40,469
+In this case, the difference is that the neuron influences
+
+123
+00:08:40,469 --> 00:08:42,880
+the cost function through multiple different paths.
+
+124
+00:08:44,680 --> 00:08:50,219
+That is, on the one hand, it influences a(L)0, which plays a role in the cost function,
+
+125
+00:08:50,219 --> 00:08:55,630
+but it also has an influence on a(L)1, which also plays a role in the cost function,
+
+126
+00:08:55,630 --> 00:08:57,540
+and you have to add those up.
+
+127
+00:08:59,820 --> 00:09:03,040
+And that, well, that's pretty much it.
+
+128
+00:09:03,500 --> 00:09:06,283
+Once you know how sensitive the cost function is to the
+
+129
+00:09:06,283 --> 00:09:09,420
+activations in this second-to-last layer, you can just repeat
+
+130
+00:09:09,420 --> 00:09:12,860
+the process for all the weights and biases feeding into that layer.
+
+131
+00:09:13,900 --> 00:09:14,960
+So pat yourself on the back!
+
+132
+00:09:15,300 --> 00:09:20,056
+If all of this makes sense, you have now looked deep into the heart of backpropagation,
+
+133
+00:09:20,056 --> 00:09:22,680
+the workhorse behind how neural networks learn.
+
+134
+00:09:23,300 --> 00:09:28,186
+These chain rule expressions give you the derivatives that determine each component in
+
+135
+00:09:28,186 --> 00:09:33,300
+the gradient that helps minimize the cost of the network by repeatedly stepping downhill.
+
+136
+00:09:34,300 --> 00:09:38,395
+If you sit back and think about all that, this is a lot of layers of complexity to
+
+137
+00:09:38,395 --> 00:09:42,740
+wrap your mind around, so don't worry if it takes time for your mind to digest it all.
+

@@ -1,0 +1,1146 @@
+1
+00:00:04,220 --> 00:00:05,400
+This is a 3.
+
+2
+00:00:06,060 --> 00:00:10,713
+It's sloppily written and rendered at an extremely low resolution of 28x28 pixels,
+
+3
+00:00:10,713 --> 00:00:13,720
+but your brain has no trouble recognizing it as a 3.
+
+4
+00:00:14,340 --> 00:00:16,559
+And I want you to take a moment to appreciate how
+
+5
+00:00:16,559 --> 00:00:18,960
+crazy it is that brains can do this so effortlessly.
+
+6
+00:00:19,700 --> 00:00:22,962
+I mean, this, this and this are also recognizable as 3s,
+
+7
+00:00:22,962 --> 00:00:27,213
+even though the specific values of each pixel is very different from one
+
+8
+00:00:27,213 --> 00:00:28,320
+image to the next.
+
+9
+00:00:28,900 --> 00:00:32,948
+The particular light-sensitive cells in your eye that are firing when you
+
+10
+00:00:32,948 --> 00:00:36,940
+see this 3 are very different from the ones firing when you see this 3.
+
+11
+00:00:37,520 --> 00:00:42,740
+But something in that crazy-smart visual cortex of yours resolves these as representing
+
+12
+00:00:42,740 --> 00:00:47,840
+the same idea, while at the same time recognizing other images as their own distinct
+
+13
+00:00:47,840 --> 00:00:48,340
+ideas.
+
+14
+00:00:49,220 --> 00:00:54,634
+But if I told you, hey, sit down and write for me a program that takes in a grid of
+
+15
+00:00:54,634 --> 00:00:59,135
+28x28 pixels like this and outputs a single number between 0 and 10,
+
+16
+00:00:59,135 --> 00:01:04,745
+telling you what it thinks the digit is, well the task goes from comically trivial to
+
+17
+00:01:04,745 --> 00:01:06,180
+dauntingly difficult.
+
+18
+00:01:07,160 --> 00:01:10,857
+Unless you've been living under a rock, I think I hardly need to motivate the relevance
+
+19
+00:01:10,857 --> 00:01:14,640
+and importance of machine learning and neural networks to the present and to the future.
+
+20
+00:01:15,120 --> 00:01:18,950
+But what I want to do here is show you what a neural network actually is,
+
+21
+00:01:18,950 --> 00:01:22,256
+assuming no background, and to help visualize what it's doing,
+
+22
+00:01:22,256 --> 00:01:24,460
+not as a buzzword but as a piece of math.
+
+23
+00:01:25,020 --> 00:01:28,777
+My hope is that you come away feeling like the structure itself is motivated,
+
+24
+00:01:28,777 --> 00:01:31,461
+and to feel like you know what it means when you read,
+
+25
+00:01:31,461 --> 00:01:34,340
+or you hear about a neural network quote-unquote learning.
+
+26
+00:01:35,360 --> 00:01:38,261
+This video is just going to be devoted to the structure component of that,
+
+27
+00:01:38,261 --> 00:01:40,260
+and the following one is going to tackle learning.
+
+28
+00:01:40,960 --> 00:01:43,278
+What we're going to do is put together a neural
+
+29
+00:01:43,278 --> 00:01:46,040
+network that can learn to recognize handwritten digits.
+
+30
+00:01:49,360 --> 00:01:52,060
+This is a somewhat classic example for introducing the topic,
+
+31
+00:01:52,060 --> 00:01:54,228
+and I'm happy to stick with the status quo here,
+
+32
+00:01:54,228 --> 00:01:57,503
+because at the end of the two videos I want to point you to a couple good
+
+33
+00:01:57,503 --> 00:02:00,911
+resources where you can learn more, and where you can download the code that
+
+34
+00:02:00,911 --> 00:02:03,080
+does this and play with it on your own computer.
+
+35
+00:02:05,040 --> 00:02:07,661
+There are many many variants of neural networks,
+
+36
+00:02:07,661 --> 00:02:12,246
+and in recent years there's been sort of a boom in research towards these variants,
+
+37
+00:02:12,246 --> 00:02:16,942
+but in these two introductory videos you and I are just going to look at the simplest
+
+38
+00:02:16,942 --> 00:02:19,180
+plain vanilla form with no added frills.
+
+39
+00:02:19,860 --> 00:02:23,890
+This is kind of a necessary prerequisite for understanding any of the more powerful
+
+40
+00:02:23,890 --> 00:02:28,212
+modern variants, and trust me it still has plenty of complexity for us to wrap our minds
+
+41
+00:02:28,212 --> 00:02:28,712
+around.
+
+42
+00:02:29,120 --> 00:02:33,195
+But even in this simplest form it can learn to recognize handwritten digits,
+
+43
+00:02:33,195 --> 00:02:36,520
+which is a pretty cool thing for a computer to be able to do.
+
+44
+00:02:37,480 --> 00:02:39,807
+And at the same time you'll see how it does fall
+
+45
+00:02:39,807 --> 00:02:42,280
+short of a couple hopes that we might have for it.
+
+46
+00:02:43,380 --> 00:02:48,500
+As the name suggests neural networks are inspired by the brain, but let's break that down.
+
+47
+00:02:48,520 --> 00:02:51,660
+What are the neurons, and in what sense are they linked together?
+
+48
+00:02:52,500 --> 00:02:58,021
+Right now when I say neuron all I want you to think about is a thing that holds a number,
+
+49
+00:02:58,021 --> 00:03:00,440
+specifically a number between 0 and 1.
+
+50
+00:03:00,680 --> 00:03:02,560
+It's really not more than that.
+
+51
+00:03:03,780 --> 00:03:08,822
+For example the network starts with a bunch of neurons corresponding to
+
+52
+00:03:08,822 --> 00:03:14,220
+each of the 28x28 pixels of the input image, which is 784 neurons in total.
+
+53
+00:03:14,700 --> 00:03:19,414
+Each one of these holds a number that represents the grayscale value of the
+
+54
+00:03:19,414 --> 00:03:24,380
+corresponding pixel, ranging from 0 for black pixels up to 1 for white pixels.
+
+55
+00:03:25,300 --> 00:03:28,253
+This number inside the neuron is called its activation,
+
+56
+00:03:28,253 --> 00:03:32,603
+and the image you might have in mind here is that each neuron is lit up when its
+
+57
+00:03:32,603 --> 00:03:34,160
+activation is a high number.
+
+58
+00:03:36,720 --> 00:03:41,860
+So all of these 784 neurons make up the first layer of our network.
+
+59
+00:03:46,500 --> 00:03:49,426
+Now jumping over to the last layer, this has 10 neurons,
+
+60
+00:03:49,426 --> 00:03:51,360
+each representing one of the digits.
+
+61
+00:03:52,040 --> 00:03:56,616
+The activation in these neurons, again some number that's between 0 and 1,
+
+62
+00:03:56,616 --> 00:04:02,120
+represents how much the system thinks that a given image corresponds with a given digit.
+
+63
+00:04:03,040 --> 00:04:06,421
+There's also a couple layers in between called the hidden layers,
+
+64
+00:04:06,421 --> 00:04:09,855
+which for the time being should just be a giant question mark for
+
+65
+00:04:09,855 --> 00:04:13,600
+how on earth this process of recognizing digits is going to be handled.
+
+66
+00:04:14,260 --> 00:04:17,860
+In this network I chose two hidden layers, each one with 16 neurons,
+
+67
+00:04:17,860 --> 00:04:20,560
+and admittedly that's kind of an arbitrary choice.
+
+68
+00:04:21,020 --> 00:04:24,655
+To be honest I chose two layers based on how I want to motivate the structure in
+
+69
+00:04:24,655 --> 00:04:28,200
+just a moment, and 16, well that was just a nice number to fit on the screen.
+
+70
+00:04:28,780 --> 00:04:32,340
+In practice there is a lot of room for experiment with a specific structure here.
+
+71
+00:04:33,020 --> 00:04:35,667
+The way the network operates, activations in one
+
+72
+00:04:35,667 --> 00:04:38,480
+layer determine the activations of the next layer.
+
+73
+00:04:39,200 --> 00:04:43,811
+And of course the heart of the network as an information processing mechanism comes down
+
+74
+00:04:43,811 --> 00:04:48,213
+to exactly how those activations from one layer bring about activations in the next
+
+75
+00:04:48,213 --> 00:04:48,713
+layer.
+
+76
+00:04:49,140 --> 00:04:53,633
+It's meant to be loosely analogous to how in biological networks of neurons,
+
+77
+00:04:53,633 --> 00:04:57,180
+some groups of neurons firing cause certain others to fire.
+
+78
+00:04:58,120 --> 00:05:01,581
+Now the network I'm showing here has already been trained to recognize digits,
+
+79
+00:05:01,581 --> 00:05:03,400
+and let me show you what I mean by that.
+
+80
+00:05:03,640 --> 00:05:08,294
+It means if you feed in an image, lighting up all 784 neurons of the input layer
+
+81
+00:05:08,294 --> 00:05:11,551
+according to the brightness of each pixel in the image,
+
+82
+00:05:11,551 --> 00:05:16,205
+that pattern of activations causes some very specific pattern in the next layer
+
+83
+00:05:16,205 --> 00:05:18,939
+which causes some pattern in the one after it,
+
+84
+00:05:18,939 --> 00:05:22,080
+which finally gives some pattern in the output layer.
+
+85
+00:05:22,560 --> 00:05:26,517
+And the brightest neuron of that output layer is the network's choice,
+
+86
+00:05:26,517 --> 00:05:29,400
+so to speak, for what digit this image represents.
+
+87
+00:05:32,560 --> 00:05:36,337
+And before jumping into the math for how one layer influences the next,
+
+88
+00:05:36,337 --> 00:05:40,062
+or how training works, let's just talk about why it's even reasonable
+
+89
+00:05:40,062 --> 00:05:43,520
+to expect a layered structure like this to behave intelligently.
+
+90
+00:05:44,060 --> 00:05:45,220
+What are we expecting here?
+
+91
+00:05:45,400 --> 00:05:47,600
+What is the best hope for what those middle layers might be doing?
+
+92
+00:05:48,920 --> 00:05:53,520
+Well, when you or I recognize digits, we piece together various components.
+
+93
+00:05:54,200 --> 00:05:56,820
+A 9 has a loop up top and a line on the right.
+
+94
+00:05:57,380 --> 00:06:01,180
+An 8 also has a loop up top, but it's paired with another loop down low.
+
+95
+00:06:01,980 --> 00:06:06,820
+A 4 basically breaks down into three specific lines, and things like that.
+
+96
+00:06:07,600 --> 00:06:11,558
+Now in a perfect world, we might hope that each neuron in the second
+
+97
+00:06:11,558 --> 00:06:14,992
+to last layer corresponds with one of these subcomponents,
+
+98
+00:06:14,992 --> 00:06:18,484
+that anytime you feed in an image with, say, a loop up top,
+
+99
+00:06:18,484 --> 00:06:22,383
+like a 9 or an 8, there's some specific neuron whose activation is
+
+100
+00:06:22,383 --> 00:06:23,780
+going to be close to 1.
+
+101
+00:06:24,500 --> 00:06:26,906
+And I don't mean this specific loop of pixels,
+
+102
+00:06:26,906 --> 00:06:31,560
+the hope would be that any generally loopy pattern towards the top sets off this neuron.
+
+103
+00:06:32,440 --> 00:06:36,049
+That way, going from the third layer to the last one just requires
+
+104
+00:06:36,049 --> 00:06:40,040
+learning which combination of subcomponents corresponds to which digits.
+
+105
+00:06:41,000 --> 00:06:43,199
+Of course, that just kicks the problem down the road,
+
+106
+00:06:43,199 --> 00:06:45,399
+because how would you recognize these subcomponents,
+
+107
+00:06:45,399 --> 00:06:47,640
+or even learn what the right subcomponents should be?
+
+108
+00:06:48,060 --> 00:06:51,218
+And I still haven't even talked about how one layer influences the next,
+
+109
+00:06:51,218 --> 00:06:53,060
+but run with me on this one for a moment.
+
+110
+00:06:53,680 --> 00:06:56,680
+Recognizing a loop can also break down into subproblems.
+
+111
+00:06:57,280 --> 00:06:59,891
+One reasonable way to do this would be to first
+
+112
+00:06:59,891 --> 00:07:02,780
+recognize the various little edges that make it up.
+
+113
+00:07:03,780 --> 00:07:08,399
+Similarly, a long line, like the kind you might see in the digits 1 or 4 or 7,
+
+114
+00:07:08,399 --> 00:07:13,432
+is really just a long edge, or maybe you think of it as a certain pattern of several
+
+115
+00:07:13,432 --> 00:07:14,320
+smaller edges.
+
+116
+00:07:15,140 --> 00:07:18,808
+So maybe our hope is that each neuron in the second layer of
+
+117
+00:07:18,808 --> 00:07:22,720
+the network corresponds with the various relevant little edges.
+
+118
+00:07:23,540 --> 00:07:27,511
+Maybe when an image like this one comes in, it lights up all of the
+
+119
+00:07:27,511 --> 00:07:31,185
+neurons associated with around 8 to 10 specific little edges,
+
+120
+00:07:31,185 --> 00:07:35,156
+which in turn lights up the neurons associated with the upper loop
+
+121
+00:07:35,156 --> 00:07:39,720
+and a long vertical line, and those light up the neuron associated with a 9.
+
+122
+00:07:40,680 --> 00:07:44,683
+Whether or not this is what our final network actually does is another question,
+
+123
+00:07:44,683 --> 00:07:47,936
+one that I'll come back to once we see how to train the network,
+
+124
+00:07:47,936 --> 00:07:51,990
+but this is a hope that we might have, a sort of goal with the layered structure
+
+125
+00:07:51,990 --> 00:07:52,540
+like this.
+
+126
+00:07:53,160 --> 00:07:56,756
+Moreover, you can imagine how being able to detect edges and patterns
+
+127
+00:07:56,756 --> 00:08:00,300
+like this would be really useful for other image recognition tasks.
+
+128
+00:08:00,880 --> 00:08:04,012
+And even beyond image recognition, there are all sorts of intelligent
+
+129
+00:08:04,012 --> 00:08:07,280
+things you might want to do that break down into layers of abstraction.
+
+130
+00:08:08,040 --> 00:08:12,729
+Parsing speech, for example, involves taking raw audio and picking out distinct sounds,
+
+131
+00:08:12,729 --> 00:08:16,503
+which combine to make certain syllables, which combine to form words,
+
+132
+00:08:16,503 --> 00:08:20,060
+which combine to make up phrases and more abstract thoughts, etc.
+
+133
+00:08:21,100 --> 00:08:23,685
+But getting back to how any of this actually works,
+
+134
+00:08:23,685 --> 00:08:27,943
+picture yourself right now designing how exactly the activations in one layer might
+
+135
+00:08:27,943 --> 00:08:29,920
+determine the activations in the next.
+
+136
+00:08:30,860 --> 00:08:35,988
+The goal is to have some mechanism that could conceivably combine pixels into edges,
+
+137
+00:08:35,988 --> 00:08:38,980
+or edges into patterns, or patterns into digits.
+
+138
+00:08:39,440 --> 00:08:43,268
+And to zoom in on one very specific example, let's say the hope
+
+139
+00:08:43,268 --> 00:08:46,914
+is for one particular neuron in the second layer to pick up
+
+140
+00:08:46,914 --> 00:08:50,620
+on whether or not the image has an edge in this region here.
+
+141
+00:08:51,440 --> 00:08:55,100
+The question at hand is what parameters should the network have?
+
+142
+00:08:55,640 --> 00:08:59,650
+What dials and knobs should you be able to tweak so that it's expressive
+
+143
+00:08:59,650 --> 00:09:03,659
+enough to potentially capture this pattern, or any other pixel pattern,
+
+144
+00:09:03,659 --> 00:09:07,780
+or the pattern that several edges can make a loop, and other such things?
+
+145
+00:09:08,720 --> 00:09:11,814
+Well, what we'll do is assign a weight to each one of the
+
+146
+00:09:11,814 --> 00:09:15,560
+connections between our neuron and the neurons from the first layer.
+
+147
+00:09:16,320 --> 00:09:17,700
+These weights are just numbers.
+
+148
+00:09:18,540 --> 00:09:21,898
+Then take all of those activations from the first layer
+
+149
+00:09:21,898 --> 00:09:25,500
+and compute their weighted sum according to these weights.
+
+150
+00:09:27,700 --> 00:09:31,097
+I find it helpful to think of these weights as being organized into a
+
+151
+00:09:31,097 --> 00:09:34,642
+little grid of their own, and I'm going to use green pixels to indicate
+
+152
+00:09:34,642 --> 00:09:37,743
+positive weights, and red pixels to indicate negative weights,
+
+153
+00:09:37,743 --> 00:09:41,780
+where the brightness of that pixel is some loose depiction of the weight's value.
+
+154
+00:09:42,780 --> 00:09:46,527
+Now if we made the weights associated with almost all of the pixels zero
+
+155
+00:09:46,527 --> 00:09:50,066
+except for some positive weights in this region that we care about,
+
+156
+00:09:50,066 --> 00:09:53,865
+then taking the weighted sum of all the pixel values really just amounts
+
+157
+00:09:53,865 --> 00:09:57,820
+to adding up the values of the pixel just in the region that we care about.
+
+158
+00:09:59,140 --> 00:10:02,392
+And if you really wanted to pick up on whether there's an edge here,
+
+159
+00:10:02,392 --> 00:10:06,600
+what you might do is have some negative weights associated with the surrounding pixels.
+
+160
+00:10:07,480 --> 00:10:10,037
+Then the sum is largest when those middle pixels
+
+161
+00:10:10,037 --> 00:10:12,700
+are bright but the surrounding pixels are darker.
+
+162
+00:10:14,260 --> 00:10:18,647
+When you compute a weighted sum like this, you might come out with any number,
+
+163
+00:10:18,647 --> 00:10:23,540
+but for this network what we want is for activations to be some value between 0 and 1.
+
+164
+00:10:24,120 --> 00:10:28,246
+So a common thing to do is to pump this weighted sum into some function
+
+165
+00:10:28,246 --> 00:10:32,140
+that squishes the real number line into the range between 0 and 1.
+
+166
+00:10:32,460 --> 00:10:35,833
+And a common function that does this is called the sigmoid function,
+
+167
+00:10:35,833 --> 00:10:37,420
+also known as a logistic curve.
+
+168
+00:10:38,000 --> 00:10:43,351
+Basically very negative inputs end up close to 0, positive inputs end up close to 1,
+
+169
+00:10:43,351 --> 00:10:46,600
+and it just steadily increases around the input 0.
+
+170
+00:10:49,120 --> 00:10:52,637
+So the activation of the neuron here is basically a
+
+171
+00:10:52,637 --> 00:10:56,360
+measure of how positive the relevant weighted sum is.
+
+172
+00:10:57,540 --> 00:10:59,641
+But maybe it's not that you want the neuron to
+
+173
+00:10:59,641 --> 00:11:01,880
+light up when the weighted sum is bigger than 0.
+
+174
+00:11:02,280 --> 00:11:06,360
+Maybe you only want it to be active when the sum is bigger than say 10.
+
+175
+00:11:06,840 --> 00:11:10,260
+That is, you want some bias for it to be inactive.
+
+176
+00:11:11,380 --> 00:11:15,466
+What we'll do then is just add in some other number like negative 10 to this
+
+177
+00:11:15,466 --> 00:11:19,660
+weighted sum before plugging it through the sigmoid squishification function.
+
+178
+00:11:20,580 --> 00:11:22,440
+That additional number is called the bias.
+
+179
+00:11:23,460 --> 00:11:27,310
+So the weights tell you what pixel pattern this neuron in the second
+
+180
+00:11:27,310 --> 00:11:31,217
+layer is picking up on, and the bias tells you how high the weighted
+
+181
+00:11:31,217 --> 00:11:35,180
+sum needs to be before the neuron starts getting meaningfully active.
+
+182
+00:11:36,120 --> 00:11:37,680
+And that is just one neuron.
+
+183
+00:11:38,280 --> 00:11:42,477
+Every other neuron in this layer is going to be connected to
+
+184
+00:11:42,477 --> 00:11:46,673
+all 784 pixel neurons from the first layer, and each one of
+
+185
+00:11:46,673 --> 00:11:50,940
+those 784 connections has its own weight associated with it.
+
+186
+00:11:51,600 --> 00:11:54,575
+Also, each one has some bias, some other number that you add
+
+187
+00:11:54,575 --> 00:11:57,600
+on to the weighted sum before squishing it with the sigmoid.
+
+188
+00:11:58,110 --> 00:11:59,540
+And that's a lot to think about!
+
+189
+00:11:59,960 --> 00:12:06,198
+With this hidden layer of 16 neurons, that's a total of 784 times 16 weights,
+
+190
+00:12:06,198 --> 00:12:07,980
+along with 16 biases.
+
+191
+00:12:08,840 --> 00:12:11,940
+And all of that is just the connections from the first layer to the second.
+
+192
+00:12:12,520 --> 00:12:14,883
+The connections between the other layers also have
+
+193
+00:12:14,883 --> 00:12:17,340
+a bunch of weights and biases associated with them.
+
+194
+00:12:18,340 --> 00:12:23,800
+All said and done, this network has almost exactly 13,000 total weights and biases.
+
+195
+00:12:23,800 --> 00:12:27,065
+13,000 knobs and dials that can be tweaked and turned
+
+196
+00:12:27,065 --> 00:12:29,960
+to make this network behave in different ways.
+
+197
+00:12:31,040 --> 00:12:34,262
+So when we talk about learning, what that's referring to is
+
+198
+00:12:34,262 --> 00:12:37,647
+getting the computer to find a valid setting for all of these
+
+199
+00:12:37,647 --> 00:12:41,360
+many many numbers so that it'll actually solve the problem at hand.
+
+200
+00:12:42,620 --> 00:12:47,186
+One thought experiment that is at once fun and kind of horrifying is to imagine sitting
+
+201
+00:12:47,186 --> 00:12:50,230
+down and setting all of these weights and biases by hand,
+
+202
+00:12:50,230 --> 00:12:54,323
+purposefully tweaking the numbers so that the second layer picks up on edges,
+
+203
+00:12:54,323 --> 00:12:56,580
+the third layer picks up on patterns, etc.
+
+204
+00:12:56,980 --> 00:13:01,342
+I personally find this satisfying rather than just treating the network as a total black
+
+205
+00:13:01,342 --> 00:13:04,812
+box, because when the network doesn't perform the way you anticipate,
+
+206
+00:13:04,812 --> 00:13:09,025
+if you've built up a little bit of a relationship with what those weights and biases
+
+207
+00:13:09,025 --> 00:13:13,090
+actually mean, you have a starting place for experimenting with how to change the
+
+208
+00:13:13,090 --> 00:13:14,180
+structure to improve.
+
+209
+00:13:14,960 --> 00:13:18,433
+Or when the network does work but not for the reasons you might expect,
+
+210
+00:13:18,433 --> 00:13:22,249
+digging into what the weights and biases are doing is a good way to challenge
+
+211
+00:13:22,249 --> 00:13:25,820
+your assumptions and really expose the full space of possible solutions.
+
+212
+00:13:26,840 --> 00:13:29,963
+By the way, the actual function here is a little cumbersome to write down,
+
+213
+00:13:29,963 --> 00:13:30,680
+don't you think?
+
+214
+00:13:32,500 --> 00:13:37,140
+So let me show you a more notationally compact way that these connections are represented.
+
+215
+00:13:37,660 --> 00:13:40,520
+This is how you'd see it if you choose to read up more about neural networks.
+
+216
+00:13:40,520 --> 00:13:48,023
+Organize all of the activations from one layer into a column as a vector.
+
+217
+00:13:48,357 --> 00:13:50,038
+Then organize all of the weights as a matrix, where each row of that matrix corresponds
+
+218
+00:13:50,038 --> 00:13:58,000
+to the connections between one layer and a particular neuron in the next layer.
+
+219
+00:13:58,540 --> 00:14:02,214
+What that means is that taking the weighted sum of the activations in
+
+220
+00:14:02,214 --> 00:14:05,887
+the first layer according to these weights corresponds to one of the
+
+221
+00:14:05,887 --> 00:14:09,880
+terms in the matrix vector product of everything we have on the left here.
+
+222
+00:14:14,000 --> 00:14:17,714
+By the way, so much of machine learning just comes down to having a good
+
+223
+00:14:17,714 --> 00:14:21,119
+grasp of linear algebra, so for any of you who want a nice visual
+
+224
+00:14:21,119 --> 00:14:24,834
+understanding for matrices and what matrix vector multiplication means,
+
+225
+00:14:24,834 --> 00:14:28,600
+take a look at the series I did on linear algebra, especially chapter 3.
+
+226
+00:14:29,240 --> 00:14:33,593
+Back to our expression, instead of talking about adding the bias to each one of
+
+227
+00:14:33,593 --> 00:14:38,002
+these values independently, we represent it by organizing all those biases into
+
+228
+00:14:38,002 --> 00:14:42,300
+a vector, and adding the entire vector to the previous matrix vector product.
+
+229
+00:14:43,280 --> 00:14:46,814
+Then as a final step, I'll wrap a sigmoid around the outside here,
+
+230
+00:14:46,814 --> 00:14:50,670
+and what that's supposed to represent is that you're going to apply the
+
+231
+00:14:50,670 --> 00:14:54,740
+sigmoid function to each specific component of the resulting vector inside.
+
+232
+00:14:55,940 --> 00:15:00,478
+So once you write down this weight matrix and these vectors as their own symbols,
+
+233
+00:15:00,478 --> 00:15:05,408
+you can communicate the full transition of activations from one layer to the next in an
+
+234
+00:15:05,408 --> 00:15:10,338
+extremely tight and neat little expression, and this makes the relevant code both a lot
+
+235
+00:15:10,338 --> 00:15:14,764
+simpler and a lot faster, since many libraries optimize the heck out of matrix
+
+236
+00:15:14,764 --> 00:15:15,660
+multiplication.
+
+237
+00:15:17,820 --> 00:15:21,460
+Remember how earlier I said these neurons are simply things that hold numbers?
+
+238
+00:15:22,220 --> 00:15:27,330
+Well of course the specific numbers that they hold depends on the image you feed in,
+
+239
+00:15:27,330 --> 00:15:31,588
+so it's actually more accurate to think of each neuron as a function,
+
+240
+00:15:31,588 --> 00:15:36,880
+one that takes in the outputs of all the neurons in the previous layer and spits out a
+
+241
+00:15:36,880 --> 00:15:38,340
+number between 0 and 1.
+
+242
+00:15:39,200 --> 00:15:43,130
+Really the entire network is just a function, one that takes in
+
+243
+00:15:43,130 --> 00:15:47,060
+784 numbers as an input and spits out 10 numbers as an output.
+
+244
+00:15:47,560 --> 00:15:51,462
+It's an absurdly complicated function, one that involves 13,000 parameters
+
+245
+00:15:51,462 --> 00:15:55,416
+in the forms of these weights and biases that pick up on certain patterns,
+
+246
+00:15:55,416 --> 00:15:59,265
+and which involves iterating many matrix vector products and the sigmoid
+
+247
+00:15:59,265 --> 00:16:02,640
+squishification function, but it's just a function nonetheless.
+
+248
+00:16:03,400 --> 00:16:06,660
+And in a way it's kind of reassuring that it looks complicated.
+
+249
+00:16:07,340 --> 00:16:09,701
+I mean if it were any simpler, what hope would we have
+
+250
+00:16:09,701 --> 00:16:12,280
+that it could take on the challenge of recognizing digits?
+
+251
+00:16:13,340 --> 00:16:14,700
+And how does it take on that challenge?
+
+252
+00:16:15,080 --> 00:16:19,360
+How does this network learn the appropriate weights and biases just by looking at data?
+
+253
+00:16:20,140 --> 00:16:23,194
+Well that's what I'll show in the next video, and I'll also dig a little
+
+254
+00:16:23,194 --> 00:16:26,120
+more into what this particular network we're seeing is really doing.
+
+255
+00:16:27,580 --> 00:16:30,748
+Now is the point I suppose I should say subscribe to stay notified
+
+256
+00:16:30,748 --> 00:16:33,148
+about when that video or any new videos come out,
+
+257
+00:16:33,148 --> 00:16:37,420
+but realistically most of you don't actually receive notifications from YouTube, do you?
+
+258
+00:16:38,020 --> 00:16:41,276
+Maybe more honestly I should say subscribe so that the neural networks
+
+259
+00:16:41,276 --> 00:16:44,578
+that underlie YouTube's recommendation algorithm are primed to believe
+
+260
+00:16:44,578 --> 00:16:47,880
+that you want to see content from this channel get recommended to you.
+
+261
+00:16:48,560 --> 00:16:49,940
+Anyway, stay posted for more.
+
+262
+00:16:50,760 --> 00:16:53,500
+Thank you very much to everyone supporting these videos on Patreon.
+
+263
+00:16:54,000 --> 00:16:57,439
+I've been a little slow to progress in the probability series this summer,
+
+264
+00:16:57,439 --> 00:16:59,716
+but I'm jumping back into it after this project,
+
+265
+00:16:59,716 --> 00:17:01,900
+so patrons you can look out for updates there.
+
+266
+00:17:03,600 --> 00:17:07,090
+To close things off here I have with me Lisha Li who did her PhD work on the
+
+267
+00:17:07,090 --> 00:17:10,717
+theoretical side of deep learning and who currently works at a venture capital
+
+268
+00:17:10,717 --> 00:17:14,620
+firm called Amplify Partners who kindly provided some of the funding for this video.
+
+269
+00:17:15,460 --> 00:17:19,120
+So Lisha one thing I think we should quickly bring up is this sigmoid function.
+
+270
+00:17:19,700 --> 00:17:23,158
+As I understand it early networks use this to squish the relevant weighted
+
+271
+00:17:23,158 --> 00:17:26,522
+sum into that interval between zero and one, you know kind of motivated
+
+272
+00:17:26,522 --> 00:17:29,840
+by this biological analogy of neurons either being inactive or active.
+
+273
+00:17:30,280 --> 00:17:34,040
+Exactly.
+But relatively few modern networks actually use sigmoid anymore.
+
+274
+00:17:34,320 --> 00:17:35,760
+Yeah.
+It's kind of old school right?
+
+275
+00:17:35,760 --> 00:17:38,980
+Yeah or rather ReLU seems to be much easier to train.
+
+276
+00:17:39,400 --> 00:17:42,340
+And ReLU, ReLU stands for rectified linear unit?
+
+277
+00:17:42,680 --> 00:17:47,401
+Yes it's this kind of function where you're just taking a max of zero
+
+278
+00:17:47,401 --> 00:17:52,054
+and a where a is given by what you were explaining in the video and
+
+279
+00:17:52,054 --> 00:17:56,570
+what this was sort of motivated from I think was a partially by a
+
+280
+00:17:56,570 --> 00:18:01,360
+biological analogy with how neurons would either be activated or not.
+
+281
+00:18:01,360 --> 00:18:06,020
+And so if it passes a certain threshold it would be the identity function but if it did
+
+282
+00:18:06,020 --> 00:18:10,840
+not then it would just not be activated so it'd be zero so it's kind of a simplification.
+
+283
+00:18:11,160 --> 00:18:15,695
+Using sigmoids didn't help training or it was very difficult to
+
+284
+00:18:15,695 --> 00:18:20,229
+train at some point and people just tried ReLU and it happened
+
+285
+00:18:20,229 --> 00:18:24,620
+to work very well for these incredibly deep neural networks.
+
+286
+00:18:25,100 --> 00:18:25,640
+All right thank you Lisha.
+

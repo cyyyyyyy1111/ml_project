@@ -1,4 +1,4 @@
-[中文版](./CDCF&Techs_ZH.md)，[English version](./CDCF&Techs_EN)
+[中文版](./CDCF&Techs_ZH.md)，[English version](./CDCF&Techs_EN.md)
 
 ---
 

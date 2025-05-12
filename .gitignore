@@ -1,0 +1,67 @@
+# ─── 虚拟环境 ──────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# Conda文件
+conda-meta/
+*.conda
+
+# Pyenv
+.python-version
+
+# ─── pythno缓存 ────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ─── 打包 ─────────────────────────────────────────────────
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# ─── IDE文件 ────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ─── JUPYTER NOTEBOOK ──────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ─── 日志文件 ────────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# ─── OS-SPECIFIC JUNK FILES ────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── 测试输出 ──────────────────────────────────────────────
+*.corrected.srt
+*.diff.txt
+*.out.srt
+tests/output/
+
+# ─── 模型文件 ────────────────────────────────────
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.bin
+*.gguf
+
+# ─── DOCKER / CI ARTIFACTS ───────────
+*.dockerfile
+Dockerfile
+docker-compose.yml
+
+# ─── PYPROJECT TOOLS ───────────────────────────────────────────
+pip-wheel-metadata/
+__pypackages__/
